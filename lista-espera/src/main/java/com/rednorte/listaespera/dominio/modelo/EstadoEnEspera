@@ -1,0 +1,16 @@
+public class EstadoEnEspera implements EstadoEspera {
+    @Override
+    public void cancelar(RegistroEspera registro) {
+        
+        registro.setEstado(new EstadoCancelado());
+        
+    }
+
+    @Override
+    public void asignar(RegistroEspera registro) {
+        registro.setEstado(new EstadoAsignado());
+    }
+
+    @Override
+    public String getNombreEstado() { return "ESPERA"; }
+}
