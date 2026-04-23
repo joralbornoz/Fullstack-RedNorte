@@ -1,35 +1,46 @@
 package com.rednorte.listaespera.aplicacion.servicios;
 
-import org.springframework.stereotype.Service;
-import lombok.RequiredArgsConstructor;
-import com.rednorte.listaespera.dominio.puertos.out.RegistroRepositoryPort;
-import com.rednorte.listaespera.dominio.puertos.out.EventoCancelacionPort;
-import com.rednorte.listaespera.dominio.factory.AtencionFactory;
 import com.rednorte.listaespera.dominio.modelo.RegistroEspera;
+import com.rednorte.listaespera.dominio.puertos.out.RegistroRepositoryPort;
+import com.rednorte.listaespera.dominio.factory.AtencionFactory;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import java.util.List; 
+import java.util.Optional; 
 
 @Service
 @RequiredArgsConstructor
-
-
 public class GestionListaEsperaService {
 
     private final RegistroRepositoryPort repositoryPort;
-    private final EventoCancelacionPort eventoPort;
 
-   
-    public RegistroEspera registrarNuevoPaciente(String tipo, String nombre, String rut) {
-        RegistroEspera nuevoRegistro = AtencionFactory.crearAtencion(tipo, nombre, rut);
-        return repositoryPort.guardar(nuevoRegistro);
+    public RegistroEspera registrarNuevoPaciente(String rut, String especialidad, String patologia) {
+        RegistroEspera nuevo = AtencionFactory.crearAtencion(rut, especialidad, patologia);
+        return repositoryPort.guardar(nuevo);
+    }
+
+    public List<RegistroEspera> obtenerTodos() {
+        return repositoryPort.buscarTodos();
     }
 
     
+    public Optional<RegistroEspera> obtenerPorId(Long id) {
+        return repositoryPort.buscarPorId(id);
+    }
+    
+
+    public RegistroEspera actualizarEstado(Long id, String nuevoEstado) {
+        return repositoryPort.buscarPorId(id).map(registro -> {
+            registro.setEstado(nuevoEstado);
+            return repositoryPort.guardar(registro);
+        }).orElseThrow(() -> new RuntimeException("No encontrado"));
+    }
+
+    public void eliminarRegistro(Long id) {
+        repositoryPort.eliminar(id);
+    }
+    
     public void cancelarCita(Long id) {
         
-        RegistroEspera registro = new RegistroEspera(); 
-        
-        
-        eventoPort.publicarEvento(registro);
-        
-        System.out.println("Cita cancelada y evento enviado al Broker.");
     }
 }

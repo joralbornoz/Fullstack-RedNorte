@@ -2,20 +2,20 @@ package com.rednorte.listaespera.infraestructura.adaptadores.salida;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "registros_espera")
 @Data
 public class RegistroEntidad {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) 
     private Long id;
 
     private String rutPaciente;
-    private String nombrePaciente;
-    private String tipoAtencion;
+    private String especialidadDestino;
+    private String patologiaSospecha;
     private String prioridad;
-    private String estado; // nombre del estado (ESPERA, CANCELADO Y LOS OTROS)
-    private LocalDateTime fechaRegistro;
+    private String estado;
+    private LocalDate fechaIngreso;
 }

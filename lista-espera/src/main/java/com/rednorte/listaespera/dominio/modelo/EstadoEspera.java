@@ -7,4 +7,3 @@ public interface EstadoEspera {
 }
 
 
-//agregar estado espera

@@ -1,38 +1,26 @@
 package com.rednorte.listaespera.dominio.factory;
 
 import com.rednorte.listaespera.dominio.modelo.RegistroEspera;
-import com.rednorte.listaespera.dominio.modelo.EstadoEspera;
+import java.time.LocalDate;
 
 public class AtencionFactory {
-    public static RegistroEspera crearAtencion(String tipo, String nombre, String rut) {
+
+    public static RegistroEspera crearAtencion(String rut, String especialidad, String patologia) {
         RegistroEspera registro = new RegistroEspera();
-        registro.setNombrePaciente(nombre);
+        
         registro.setRutPaciente(rut);
-        registro.setTipoAtencion(tipo);
-        
-        
-        if (tipo.equalsIgnoreCase("URGENCIA")) {
+        registro.setEspecialidadDestino(especialidad); 
+        registro.setPatologiaSospecha(patologia);      
+        registro.setFechaIngreso(LocalDate.now());
+      
+        if (especialidad.equalsIgnoreCase("CARDIOLOGIA") || especialidad.equalsIgnoreCase("URGENCIA")) {
             registro.setPrioridad("ALTA");
         } else {
             registro.setPrioridad("MEDIA");
         }
         
-        registro.setEstado(new EstadoEspera() {
-            @Override
-            public void cancelar(RegistroEspera registro) {
-                
-            }
+        registro.setEstado("PENDIENTE");
 
-            @Override
-            public void asignar(RegistroEspera registro) {
-              
-            }
-
-            @Override
-            public String getNombreEstado() {
-                return "PENDIENTE";
-            }
-        });
         return registro;
     }
 }
