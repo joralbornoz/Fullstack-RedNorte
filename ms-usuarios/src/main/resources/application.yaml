@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: ms-usuarios
+  profiles:
+
+    active: dev
+  jackson:
+    date-format: dd/MM/yyyy
+    time-zone: America/Santiago
+
+server:
+  port: 8001
+
+

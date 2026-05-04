@@ -1,0 +1,13 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: ms-bff
+
+# Configuramos las URLs de los microservicios a los que llamará el BFF
+services:
+  usuarios:
+    url: http://localhost:8001
+  lista-espera:
+    url: http://localhost:8002

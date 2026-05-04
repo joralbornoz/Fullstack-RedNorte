@@ -1,0 +1,63 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      # Configuración de CORS para que el Frontend (React/Vite) pueda conectar
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:5173" # Puerto por defecto de Vite
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - PATCH
+              - DELETE
+            allowedHeaders: "*"
+
+      routes:
+        # --- 1a. RUTA PÚBLICA DE USUARIOS (LOGIN/REGISTRO) ---
+        - id: ms-usuarios-public-route
+          uri: http://localhost:8001
+          predicates:
+            - Path=/api/v1/usuarios/auth/** # Los endpoints que no necesitan token
+          # SIN FILTRO
+
+        # --- 1b. RUTA PRIVADA DE USUARIOS (GESTIÓN) ---
+        - id: ms-usuarios-private-route
+          uri: http://localhost:8001
+          predicates:
+            - Path=/api/v1/usuarios/** # El resto de las rutas
+          filters:
+            - JwtAuthenticationFilter # CON FILTRO
+
+        # --- 2. LISTA DE ESPERA (CORRECTO) ---
+        - id: ms-lista-espera-route
+          uri: http://localhost:8002
+          predicates:
+            - Path=/api/v1/lista-espera/**
+          filters:
+            - JwtAuthenticationFilter
+
+        # --- 4. RUTA HACIA MICROSERVICIO REASIGNACION ---
+        - id: ms-reasignacion-route
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/v1/reasignacion/**
+          filters:
+            - JwtAuthenticationFilter
+
+      # Configuración de tiempos de espera para evitar que la Gateway
+      # corte la conexión si un microservicio tarda en responder
+      httpclient:
+        connect-timeout: 5000
+        response-timeout: 5s
+
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO # Cambiado de TRACE a INFO para no saturar la consola
+    org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator: INFO
