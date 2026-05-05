@@ -1,21 +1,19 @@
 package com.rednorte.listaespera.dominio.modelo;
 
-import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "registros_espera") 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class RegistroEspera {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; 
-    
     private String rutPaciente;
     private String especialidadDestino;
     private String patologiaSospecha;
     private LocalDate fechaIngreso;
     private String prioridad;
-    private String estado;
+    private String estado; 
 }

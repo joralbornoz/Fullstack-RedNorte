@@ -13,25 +13,27 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RegistroPersistenceAdapter implements RegistroRepositoryPort {
 
-    // Cambié el nombre a algo genérico ya que ahora usas MySQL
     private final MySqlRegistroRepository repository; 
 
     @Override
     public RegistroEspera guardar(RegistroEspera dominio) {
+        
         RegistroEntidad entidad = new RegistroEntidad();
         
-        // Mapeo manual de Dominio a Entidad
         if (dominio.getId() != null) entidad.setId(dominio.getId());
         entidad.setRutPaciente(dominio.getRutPaciente());
         entidad.setEspecialidadDestino(dominio.getEspecialidadDestino());
         entidad.setPatologiaSospecha(dominio.getPatologiaSospecha());
         entidad.setPrioridad(dominio.getPrioridad());
+        
+        
         entidad.setEstado(dominio.getEstado());
         entidad.setFechaIngreso(dominio.getFechaIngreso());
 
         RegistroEntidad guardado = repository.save(entidad);
-        dominio.setId(guardado.getId());
-        return dominio;
+        
+        
+        return mapToDomain(guardado);
     }
 
     @Override
@@ -52,7 +54,7 @@ public class RegistroPersistenceAdapter implements RegistroRepositoryPort {
         repository.deleteById(id);
     }
 
-    // Método auxiliar para no repetir código de mapeo
+    
     private RegistroEspera mapToDomain(RegistroEntidad entidad) {
         RegistroEspera d = new RegistroEspera();
         d.setId(entidad.getId());
@@ -60,7 +62,7 @@ public class RegistroPersistenceAdapter implements RegistroRepositoryPort {
         d.setEspecialidadDestino(entidad.getEspecialidadDestino());
         d.setPatologiaSospecha(entidad.getPatologiaSospecha());
         d.setPrioridad(entidad.getPrioridad());
-        d.setEstado(entidad.getEstado());
+        d.setEstado(entidad.getEstado()); // Mapeo de String a String
         d.setFechaIngreso(entidad.getFechaIngreso());
         return d;
     }
