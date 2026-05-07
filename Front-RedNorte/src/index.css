@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Sora:wght@400;500;600&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --teal-primary:   #0e9b84;
+  --teal-light:     #ccfaf2;
+  --teal-crystal:   #f0fdfb;
+  --teal-dark:      #076457;
+  --teal-mid:       #2dd4bf;
+  --accent-coral:   #f97316;
+  --accent-amber:   #f59e0b;
+  --surface:        #ffffff;
+  --surface-2:      #f8fffe;
+  --surface-3:      #f0fdfb;
+  --border:         rgba(14,155,132,0.15);
+  --border-strong:  rgba(14,155,132,0.3);
+  --text-primary:   #0f2421;
+  --text-secondary: #3d6b64;
+  --text-muted:     #7fb3ac;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--surface-3);
+  color: var(--text-primary);
+  font-family: 'DM Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Crystal glass card */
+.glass-card {
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(14,155,132,0.12);
+  border-radius: 1rem;
+}
+
+/* Pill nav active */
+.nav-active {
+  background: var(--teal-primary);
+  color: white;
+}
+
+/* Subtle scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--teal-light); border-radius: 99px; }
+
+/* Smooth transitions */
+* { transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease; }
