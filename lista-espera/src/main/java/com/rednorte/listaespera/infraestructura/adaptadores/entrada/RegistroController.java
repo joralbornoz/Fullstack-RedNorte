@@ -60,9 +60,4 @@ public class RegistroController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/cancelar/{id}")
-    public ResponseEntity<Void> cancelar(@PathVariable Long id) {
-        service.cancelarCita(id);
-        return ResponseEntity.ok().build();
-    }
 }  
