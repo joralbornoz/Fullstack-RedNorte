@@ -10,7 +10,7 @@ public class AtencionFactory {
     String esp = (especialidad != null) ? especialidad.toUpperCase() : "";
 
     if (esp.equals("CARDIOLOGIA") || esp.equals("URGENCIA")) {
-        registro.setPrioridad("ALTA");
+        registro.setPrioridad("3");
     } 
     
     else if (prioridadManual != null && !prioridadManual.isEmpty()) {
@@ -18,11 +18,11 @@ public class AtencionFactory {
     }
 
     else if (esp.equals("TRAUMATOLOGIA") || esp.equals("PEDIATRIA")) {
-        registro.setPrioridad("MEDIA");
+        registro.setPrioridad("2");
     }
 
     else {
-        registro.setPrioridad("BAJA");
+        registro.setPrioridad("1");
     }
 
     return registro;
