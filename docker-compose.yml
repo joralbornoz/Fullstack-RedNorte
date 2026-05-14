@@ -1,17 +1,17 @@
 services:
-  mysql-db:
+  db-lista-espera:        
     image: mysql:8.0
-    container_name: mysql-rednorte
+    container_name: mysql-lista-espera
     restart: always
     environment:
       MYSQL_DATABASE: rednorte_db
-      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_ROOT_PASSWORD: Gab714@
       MYSQL_USER: user_rednorte
       MYSQL_PASSWORD: admin123
     ports:
-      - "3307:3306" 
+      - "3307:3306"       
     volumes:
-      - mysql_data:/var/lib/mysql
+      - lista_espera_data:/var/lib/mysql
 
 volumes:
-  mysql_data:
+  lista_espera_data:      

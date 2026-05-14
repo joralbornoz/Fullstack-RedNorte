@@ -20,12 +20,12 @@ public class RegistroController {
     private final GestionListaEsperaService service; 
 
     @PostMapping("/registrar")
-    public ResponseEntity<RegistroDTO> registrar(@RequestBody Map<String, String> request) {
+    public ResponseEntity<RegistroDTO> registrar(@RequestBody RegistroDTO dto) {
     RegistroDTO nuevo = service.registrarNuevo(
-        request.get("rutPaciente"),
-        request.get("especialidadDestino"),
-        request.get("patologiaSospecha"),
-        request.get("prioridad")
+        dto.getRutPaciente(),
+        dto.getEspecialidadDestino(),
+        dto.getPatologiaSospecha(),
+        dto.getPrioridad()
     );
     return ResponseEntity.ok(nuevo);
 }
@@ -44,7 +44,7 @@ public class RegistroController {
 
     @PutMapping("/actualizar/{id}")
     public ResponseEntity<RegistroEspera> actualizar(@PathVariable Long id, @RequestBody Map<String, String> request) {
-        // Extraemos el string "estado" del JSON que envíes por Postman
+        
         String nuevoEstado = request.get("estado");
         try {
             RegistroEspera actualizado = service.actualizarEstado(id, nuevoEstado);

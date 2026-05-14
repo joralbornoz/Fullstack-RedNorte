@@ -16,7 +16,6 @@ public class GestionListaEsperaService {
 
     private final RegistroRepositoryPort repositoryPort;
 
-    
     public RegistroDTO registrarNuevo(String rut, String esp, String pato, String prioridad) {
         RegistroEspera nuevo = AtencionFactory.crearAtencion(rut, esp, pato, prioridad);
         RegistroEspera guardado = repositoryPort.guardar(nuevo);
@@ -25,18 +24,19 @@ public class GestionListaEsperaService {
             guardado.getId(),
             guardado.getRutPaciente(),
             guardado.getEspecialidadDestino(),
+            guardado.getPatologiaSospecha(), 
             guardado.getPrioridad(),
             guardado.getEstado()
         );
     }
 
-    
     public List<RegistroDTO> obtenerTodos() {
         return repositoryPort.buscarTodos().stream()
             .map(registro -> new RegistroDTO(
                 registro.getId(),
                 registro.getRutPaciente(),
                 registro.getEspecialidadDestino(),
+                registro.getPatologiaSospecha(), 
                 registro.getPrioridad(),
                 registro.getEstado()
             ))
