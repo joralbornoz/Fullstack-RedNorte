@@ -7,4 +7,5 @@ public interface ReasignacionRepository {
     Reasignacion guardar(Reasignacion reasignacion);
     List<Reasignacion> obtenerTodas();
     void eliminar(Long id);
+    java.util.Optional<Reasignacion> obtenerPorId(Long id);
 }

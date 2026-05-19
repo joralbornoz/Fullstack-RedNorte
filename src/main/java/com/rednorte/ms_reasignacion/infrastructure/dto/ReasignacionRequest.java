@@ -5,6 +5,6 @@ import lombok.Data;
 @Data
 public class ReasignacionRequest {
     private String idCitaOriginal;
-    private String rutPaciente; // Aquí recibiremos el xxxxxxxx-x
+    private String rutPaciente;
     private String especialidad;
 }

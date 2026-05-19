@@ -16,10 +16,20 @@ public class ReasignacionPersistenceAdapter implements ReasignacionRepository {
     @Override
     public Reasignacion guardar(Reasignacion reasignacion) {
         ReasignacionEntity entity = new ReasignacionEntity();
+        if (reasignacion.getId() != null) {
+            entity.setId(reasignacion.getId());
+        }
         entity.setIdCitaOriginal(reasignacion.getIdCitaOriginal());
         entity.setRutPaciente(reasignacion.getRutPaciente());
         entity.setEspecialidad(reasignacion.getEspecialidad());
         entity.setFechaRegistro(reasignacion.getFechaRegistro());
+
+        entity.setMotivoCancelacion(reasignacion.getMotivoCancelacion());
+        entity.setMedicoOriginal(reasignacion.getMedicoOriginal());
+        entity.setPrioridadReasignacion(reasignacion.getPrioridadReasignacion());
+        entity.setRequiereExamenesPrevios(reasignacion.getRequiereExamenesPrevios());
+        entity.setPreferenciaHorario(reasignacion.getPreferenciaHorario());
+        entity.setEstado(reasignacion.getEstado());
 
         ReasignacionEntity saved = jpaRepository.save(entity);
         reasignacion.setId(saved.getId());
@@ -36,6 +46,14 @@ public class ReasignacionPersistenceAdapter implements ReasignacionRepository {
             );
             domain.setId(entity.getId());
             domain.setFechaRegistro(entity.getFechaRegistro());
+
+            domain.setMotivoCancelacion(entity.getMotivoCancelacion());
+            domain.setMedicoOriginal(entity.getMedicoOriginal());
+            domain.setPrioridadReasignacion(entity.getPrioridadReasignacion());
+            domain.setRequiereExamenesPrevios(entity.getRequiereExamenesPrevios());
+            domain.setPreferenciaHorario(entity.getPreferenciaHorario());
+            domain.setEstado(entity.getEstado());
+
             return domain;
         }).collect(Collectors.toList());
     }
@@ -43,5 +61,25 @@ public class ReasignacionPersistenceAdapter implements ReasignacionRepository {
     @Override
     public void eliminar(Long id) {
         jpaRepository.deleteById(id);
+    }
+
+    @Override
+    public java.util.Optional<Reasignacion> obtenerPorId(Long id) {
+        return jpaRepository.findById(id).map(entity -> {
+            Reasignacion domain = new Reasignacion(
+                    entity.getIdCitaOriginal(),
+                    entity.getRutPaciente(),
+                    entity.getEspecialidad()
+            );
+            domain.setId(entity.getId());
+            domain.setFechaRegistro(entity.getFechaRegistro());
+            domain.setMotivoCancelacion(entity.getMotivoCancelacion());
+            domain.setMedicoOriginal(entity.getMedicoOriginal());
+            domain.setPrioridadReasignacion(entity.getPrioridadReasignacion());
+            domain.setRequiereExamenesPrevios(entity.getRequiereExamenesPrevios());
+            domain.setPreferenciaHorario(entity.getPreferenciaHorario());
+            domain.setEstado(entity.getEstado());
+            return domain;
+        });
     }
 }

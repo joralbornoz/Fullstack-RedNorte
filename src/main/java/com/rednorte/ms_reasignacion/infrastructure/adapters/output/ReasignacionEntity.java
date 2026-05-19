@@ -18,4 +18,11 @@ public class ReasignacionEntity {
     private String rutPaciente;
     private String especialidad;
     private LocalDateTime fechaRegistro;
+
+    private String motivoCancelacion;
+    private String medicoOriginal;
+    private String prioridadReasignacion;
+    private Boolean requiereExamenesPrevios;
+    private String preferenciaHorario;
+    private String estado;
 }

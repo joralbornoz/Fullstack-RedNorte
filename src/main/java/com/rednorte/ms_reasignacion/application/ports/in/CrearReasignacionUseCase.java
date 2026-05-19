@@ -7,4 +7,6 @@ public interface CrearReasignacionUseCase {
     Reasignacion ejecutar(String idCita, String rut, String especialidad);
     List<Reasignacion> listarTodas();
     void borrar(Long id);
+    Reasignacion obtenerPorId(Long id);
+    Reasignacion actualizarEstado(Long id, String nuevoEstado);
 }

@@ -31,4 +31,17 @@ public class ReasignacionService implements CrearReasignacionUseCase {
     public void borrar(Long id) {
         reasignacionRepository.eliminar(id);
     }
+
+    @Override
+    public Reasignacion obtenerPorId(Long id) {
+        return reasignacionRepository.obtenerPorId(id)
+                .orElseThrow(() -> new IllegalArgumentException("Reasignación no encontrada con ID: " + id));
+    }
+
+    @Override
+    public Reasignacion actualizarEstado(Long id, String nuevoEstado) {
+        Reasignacion reasignacion = obtenerPorId(id);
+        reasignacion.setEstado(nuevoEstado);
+        return reasignacionRepository.guardar(reasignacion);
+    }
 }
