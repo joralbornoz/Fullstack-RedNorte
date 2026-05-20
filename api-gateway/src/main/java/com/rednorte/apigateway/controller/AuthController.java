@@ -13,34 +13,41 @@ import java.util.Map;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
-    private final WebClient.Builder webClientBuilder;
+    private final WebClient webClient;
     private final JwtUtil jwtUtil;
+    private final String usuariosUrl;
 
-    @Value("${services.usuarios.url:http://localhost:8001/api/v1}")
-    private String usuariosUrl;
-
-    public AuthController(WebClient.Builder webClientBuilder, JwtUtil jwtUtil) {
-        this.webClientBuilder = webClientBuilder;
+    public AuthController(
+            WebClient.Builder webClientBuilder,
+            JwtUtil jwtUtil,
+            @Value("${services.usuarios.url:http://localhost:8001/api/v1}") String usuariosUrl) {
+        this.webClient = webClientBuilder.build();
         this.jwtUtil = jwtUtil;
+        this.usuariosUrl = usuariosUrl;
     }
 
     @PostMapping("/login")
     public Mono<AuthResponse> login(@RequestBody Map<String, String> request) {
-        System.out.println("🛃 [Gateway] Procesando login para: " + request.get("rut"));
-        System.out.println("🔗 [Gateway] Llamando a: " + usuariosUrl);
+        System.out.println("🛃 [Gateway] Login para: " + request.get("rut"));
+        System.out.println("🔗 [Gateway] URL ms-usuarios: " + usuariosUrl);
 
-        return webClientBuilder.build()
-                .post()
+        return webClient.post()
                 .uri(usuariosUrl + "/usuarios/auth/login")
                 .bodyValue(request)
                 .retrieve()
                 .bodyToMono(Map.class)
+                .doOnNext(userData -> System.out.println("✅ [Gateway] Respuesta ms-usuarios: " + userData))
+                .doOnError(e -> System.err.println("❌ [Gateway] Error: " + e.getClass().getName() + " - " + e.getMessage()))
                 .map(userData -> {
                     String token = jwtUtil.generateToken(
                             userData.get("rut").toString(),
                             userData.get("rol").toString()
                     );
-                    return new AuthResponse(token, userData.get("rut").toString(), userData.get("rol").toString());
+                    return new AuthResponse(
+                            token,
+                            userData.get("rut").toString(),
+                            userData.get("rol").toString()
+                    );
                 });
+         }
     }
-}
