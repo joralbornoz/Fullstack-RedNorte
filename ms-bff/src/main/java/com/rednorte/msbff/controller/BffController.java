@@ -1,6 +1,6 @@
 package com.rednorte.msbff.controller;
 
-import com.rednorte.msbff.dto.CancelacionDTO; // 👈 Importamos el DTO de cancelación con Lombok que creamos
+import com.rednorte.msbff.dto.CancelacionDTO;
 import com.rednorte.msbff.dto.DashboardSummaryDTO;
 import com.rednorte.msbff.dto.PacienteDetalleDTO;
 import com.rednorte.msbff.dto.RegistroListaEsperaDetalleDTO;

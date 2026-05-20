@@ -1,9 +1,9 @@
 version: '3.8'
 
 services:
-  # -----------------------------------------------------
-  # 1. BASE DE DATOS DE USUARIOS (Puerto 3306)
-  # -----------------------------------------------------
+  # -------------------------------------------------------
+  # BASES DE DATOS
+  # -------------------------------------------------------
   db-usuarios:
     image: mysql:8.0
     container_name: rednorte-db-usuarios
@@ -17,10 +17,12 @@ services:
       - "3306:3306"
     volumes:
       - db-usuarios-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # -----------------------------------------------------
-  # 2. BASE DE DATOS DE LISTA DE ESPERA (Puerto 3307)
-  # -----------------------------------------------------
   db-lista-espera:
     image: mysql:8.0
     container_name: rednorte-db-lista-espera
@@ -34,37 +36,12 @@ services:
       - "3307:3306"
     volumes:
       - db-lista-espera-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # -----------------------------------------------------
-  # 3. ZOOKEEPER (Coordinador de Kafka)
-  # -----------------------------------------------------
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    container_name: rednorte-zookeeper
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-
-  # -----------------------------------------------------
-  # 4. KAFKA BROKER (Puerto 9092)
-  # -----------------------------------------------------
-  kafka:
-    image: confluentinc/cp-kafka:7.5.0  # Usar una versión estable conocida
-    container_name: rednorte-kafka
-    depends_on:
-      - zookeeper
-    ports:
-      - "9092:9092"
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-  # -----------------------------------------------------
-  # 5. BASE DE DATOS DE REASIGNACION (Puerto 3308)
-  # -----------------------------------------------------
   db-reasignacion:
     image: mysql:8.0
     container_name: rednorte-db-reasignacion
@@ -75,11 +52,128 @@ services:
       MYSQL_USER: user_reasignacion
       MYSQL_PASSWORD: devpassword
     ports:
-      - "3308:3306" # Exponemos en el 3308
+      - "3308:3306"
     volumes:
       - db-reasignacion-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-# No olvides agregar el volumen al final del archivo
+  # -------------------------------------------------------
+  # KAFKA
+  # -------------------------------------------------------
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: rednorte-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: rednorte-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  # -------------------------------------------------------
+  # MICROSERVICIOS
+  # -------------------------------------------------------
+  ms-usuarios:
+    build: ./ms-usuarios
+    container_name: rednorte-ms-usuarios
+    restart: on-failure
+    ports:
+      - "8001:8001"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db-usuarios:3306/rednorte_usuarios?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: user_usuarios
+      SPRING_DATASOURCE_PASSWORD: devpassword
+      SPRING_PROFILES_ACTIVE: prod
+    depends_on:
+      db-usuarios:
+        condition: service_healthy
+
+  lista-espera:
+    build: ./lista-espera
+    container_name: rednorte-lista-espera
+    restart: on-failure
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db-lista-espera:3306/db_lista_espera?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: user_lista_espera
+      SPRING_DATASOURCE_PASSWORD: devpassword
+      SPRING_PROFILES_ACTIVE: prod
+    depends_on:
+      db-lista-espera:
+        condition: service_healthy
+
+  ms-reasignacion:
+    build: ./ms-reasignacion
+    container_name: rednorte-ms-reasignacion
+    restart: on-failure
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db-reasignacion:3306/db_reasignacion?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: user_reasignacion
+      SPRING_DATASOURCE_PASSWORD: devpassword
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_PROFILES_ACTIVE: prod
+    depends_on:
+      db-reasignacion:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  ms-bff:
+    build: ./ms-bff
+    container_name: rednorte-ms-bff
+    restart: on-failure
+    ports:
+      - "8081:8081"
+    environment:
+      SERVICES_USUARIOS_URL: http://ms-usuarios:8001/api/v1
+      SERVICES_LISTA-ESPERA_URL: http://lista-espera:8082/api/v1
+      SERVICES_REASIGNACION_URL: http://ms-reasignacion:8083/api/v1
+      SPRING_PROFILES_ACTIVE: prod
+    depends_on:
+      - ms-usuarios
+      - lista-espera
+      - ms-reasignacion
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: rednorte-api-gateway
+    restart: on-failure
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+    depends_on:
+      - ms-bff
+      - ms-usuarios
+
+  frontend:
+    build: ./Front-RedNorte
+    container_name: rednorte-frontend
+    restart: on-failure
+    ports:
+      - "3000:80"
+    depends_on:
+      - api-gateway
+
 volumes:
   db-usuarios-data:
   db-lista-espera-data:

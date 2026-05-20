@@ -25,4 +25,13 @@ public interface MySqlRegistroRepository extends JpaRepository<RegistroEntidad, 
             "ORDER BY r.fechaIngreso ASC") // <--- ASC ordena de más antigua a más reciente
     List<RegistroEntidad> buscarCandidatoTop(@Param("esp") String esp, Pageable pageable);;
 
+    @Query("SELECT r FROM RegistroEntidad r ORDER BY " +
+            "CASE r.prioridad " +
+            "WHEN 'ALTA' THEN 1 " +
+            "WHEN 'MEDIA' THEN 2 " +
+            "WHEN 'BAJA' THEN 3 " +
+            "ELSE 4 END ASC, " +
+            "r.fechaIngreso ASC")
+    List<RegistroEntidad> findAllOrdenado();
+
 }

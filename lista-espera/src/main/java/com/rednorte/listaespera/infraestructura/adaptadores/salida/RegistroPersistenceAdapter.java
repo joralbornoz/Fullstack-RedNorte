@@ -46,7 +46,7 @@ public class RegistroPersistenceAdapter implements RegistroRepositoryPort {
 
     @Override
     public List<RegistroEspera> buscarTodos() {
-        return repository.findAll().stream()
+        return repository.findAllOrdenado().stream()
                 .map(this::mapToDomain)
                 .collect(Collectors.toList());
     }

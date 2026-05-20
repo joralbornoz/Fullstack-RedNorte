@@ -1,19 +1,35 @@
+server:
+  port: 8083
+
+spring:
+  datasource:
+    url: jdbc:mysql://db-reasignacion:3306/db_reasignacion?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: user_reasignacion
+    password: devpassword
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  kafka:
+    bootstrap-servers: kafka:9092
+    consumer:
+      group-id: reasignacion-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.rednorte.msreasignacion.domain.model"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
 services:
   lista-espera:
-    url: http://ms-lista-espera:8002
+    url: http://lista-espera:8082
   usuarios:
     url: http://ms-usuarios:8001
 
-# Configuración real de servidor de correos (Ejemplo)
-spring:
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${EMAIL_USER}
-    password: ${EMAIL_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
+logging:
+  level:
+    root: INFO
+    com.rednorte.msreasignacion: INFO

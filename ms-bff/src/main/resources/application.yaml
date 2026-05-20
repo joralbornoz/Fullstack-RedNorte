@@ -4,12 +4,10 @@ server:
 spring:
   application:
     name: ms-bff
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
 
-# Configuramos las URLs de los microservicios a los que llamará el BFF
-services:
-  usuarios:
-    url: http://localhost:8001
-  lista-espera:
-    url: http://localhost:8082
-  reasignacion:
-    url: http://localhost:8083
+logging:
+  level:
+    root: INFO
+    com.rednorte.msbff: INFO

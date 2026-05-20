@@ -43,7 +43,7 @@ export const authService = {
   // 🔥 SOLUCIÓN AL 401: Eliminamos '/usuarios' porque tu Postman demostró 
   // que el endpoint directo del backend es simplemente '/auth/login'
   // URL Final: http://localhost:8080/api/v1/auth/login
-  login: (credentials) => api.post('/auth/login', credentials), 
+  login: (credentials) => api.post('/auth/login', credentials),
   
   // ✅ Alineamos el resto de los endpoints de autenticación sin el prefijo erróneo
   logout: () => api.post('/auth/logout'),

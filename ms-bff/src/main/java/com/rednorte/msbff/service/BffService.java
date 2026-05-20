@@ -3,9 +3,9 @@ package com.rednorte.msbff.service;
 import com.rednorte.msbff.client.ExternalServiceClient;
 import com.rednorte.msbff.dto.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -16,9 +16,9 @@ import java.util.Map;
 public class BffService {
 
     private final ExternalServiceClient client;
-    private final WebClient webClient;
 
-    // ... tus otros métodos permanecen igual ...
+    @Value("${services.lista-espera.url}")
+    private String urlListaEspera;
 
     public Mono<ResponseEntity<Object>> obtenerListaEspera(String token) {
         return client.obtenerListaEsperaTodos(token);
@@ -28,8 +28,10 @@ public class BffService {
         return client.obtenerListaEsperaParaDashboard(token)
                 .flatMap(registro -> {
                     String rut = (String) (registro.get("rutPaciente") != null ? registro.get("rutPaciente") : registro.get("rut"));
-                    String rutSanitizado = (rut != null) ? rut.replace(".", "").trim() : "16912006-4";
+                    String rutSanitizado = (rut != null) ? rut.replace(".", "").replace(" ", "").trim() : "16912006-4";
+                    System.out.println("🔍 [BFF] Buscando usuario con RUT: " + rutSanitizado);
                     return client.obtenerUsuarioPorRutComoMap(rutSanitizado, token)
+                            .doOnNext(userMap -> System.out.println("👤 [BFF] Usuario encontrado: " + userMap))
                             .defaultIfEmpty(Map.of())
                             .map(userMap -> mapToDetalleDTO(registro, rut, userMap));
                 });
@@ -67,32 +69,29 @@ public class BffService {
         return client.consultasPaciente(rut, token);
     }
 
-    // ── MÉTODO CORREGIDO ──
     public Mono<Void> cancelarYReasignar(CancelacionDTO dto, String token) {
-        // Aseguramos que el token tenga el prefijo "Bearer "
-        String authHeader = token.startsWith("Bearer ") ? token : "Bearer " + token;
-
-        System.out.println("🚨 [BFF] Llamando a 8082 con token: " + authHeader.substring(0, 20) + "...");
-
-        return webClient.put()
-                .uri("http://localhost:8082/api/v1/lista-espera/" + dto.getId() + "/estado")
-                .header("Authorization", authHeader) // Usamos el header corregido
-                .bodyValue(dto)
-                .retrieve()
-                .bodyToMono(Void.class)
-                .doOnError(e -> System.err.println("🚨 ERROR EN LLAMADA A 8082: " + e.getMessage()));
+        System.out.println("🚨 [BFF] Cancelando interconsulta ID: " + dto.getId());
+        return client.cancelarListaEspera(dto)
+                .doOnError(e -> System.err.println("🚨 ERROR al cancelar: " + e.getMessage()))
+                .onErrorResume(e -> Mono.empty());
     }
 
     private RegistroListaEsperaDetalleDTO mapToDetalleDTO(Map<String, Object> registro, String rut, Map<String, Object> userMap) {
         String nombre = "Usuario no encontrado";
+        String email = "N/A";
+
         if (userMap != null && !userMap.isEmpty()) {
-            Map actualUser = userMap.containsKey("data") && userMap.get("data") instanceof Map ? (Map) userMap.get("data") : userMap;
+            Map actualUser = userMap.containsKey("data") && userMap.get("data") instanceof Map
+                    ? (Map) userMap.get("data") : userMap;
             nombre = (String) actualUser.getOrDefault("nombreCompleto", "Usuario sin nombre");
+            email  = (String) actualUser.getOrDefault("email", "N/A");
         }
+
         return new RegistroListaEsperaDetalleDTO(
-                Long.valueOf(registro.get("id").toString()), rut, nombre, "N/A",
+                Long.valueOf(registro.get("id").toString()), rut, nombre, email,
                 (String) registro.get("especialidadDestino"), (String) registro.get("patologiaSospecha"),
-                (String) registro.get("prioridad"), (String) registro.get("estado"), (String) registro.get("fechaIngreso")
+                (String) registro.get("prioridad"), (String) registro.get("estado"),
+                (String) registro.get("fechaIngreso")
         );
     }
 }

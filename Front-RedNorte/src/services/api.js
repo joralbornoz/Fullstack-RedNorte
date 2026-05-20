@@ -3,7 +3,7 @@ import axios from 'axios'
 // ✅ CONFIGURACIÓN UNIFICADA: Apuntamos la URL base general a la raíz del API Gateway (8080)
 // Esto nos permitirá usar un único cliente para Login y para el Negocio Orquestado del BFF.
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api/v1', 
+  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8080/api/v1',
   timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 })

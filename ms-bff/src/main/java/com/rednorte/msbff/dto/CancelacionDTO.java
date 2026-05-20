@@ -13,5 +13,6 @@ public class CancelacionDTO {
     private String rutPaciente;
     private String especialidadDestino; // 🚀 Corregido para que calce perfecto con el JSON de tu React
     private String motivo;
+    private String canceladoPor;
 
 }

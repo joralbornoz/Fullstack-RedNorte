@@ -1,14 +1,13 @@
+server:
+  port: 8083
+
 spring:
   application:
     name: ms-reasignacion
   profiles:
-    active: dev # Por defecto arranca en modo desarrollo
+    active: ${SPRING_PROFILES_ACTIVE:dev}
 
-server:
-  port: 8083 # Puerto asignado para reasignación
-
-# Configuración de logs para ver qué pasa con la reasignación automática
 logging:
   level:
     root: INFO
-    com.rednorte.msreasignacion: DEBUG
+    com.rednorte.msreasignacion: INFO

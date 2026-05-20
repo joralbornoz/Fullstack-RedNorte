@@ -39,6 +39,7 @@ public class SecurityConfig {
 
                         // Rutas de autenticación pública (Generación inicial del token)
                         .pathMatchers("/api/v1/auth/**").permitAll()
+                        .pathMatchers("/api/v1/usuarios/auth/**").permitAll()
 
                         // Rutas de Pacientes (Tienen acceso: PACIENTE, MEDICO y ADMIN)
                         .pathMatchers("/api/v1/lista-espera/paciente/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MEDICO", "ROLE_PACIENTE")

@@ -15,16 +15,7 @@ public class ConfiguracionSeguridad {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/v1/lista-espera/todos",
-                                "/api/v1/lista-espera/paciente/**",
-                                "/api/v1/lista-espera/*/estado",
-                                "/api/v1/lista-espera/siguiente",
-                                "/api/v1/lista-espera/actualizar/**",
-                                // 🔥 AÑADIDO: Permitimos el acceso público para probar el flujo de cancelación
-                                "/api/v1/lista-espera/cancelar"
-                        ).permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 );
 
         return http.build();

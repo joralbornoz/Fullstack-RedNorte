@@ -2,6 +2,10 @@ server:
   port: 8080
 
 spring:
+  application:
+    name: api-gateway
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
   cloud:
     gateway:
       globalcors:
@@ -17,43 +21,12 @@ spring:
               - OPTIONS
             allowedHeaders: "*"
             allowCredentials: true
-
-      routes:
-        # 1. BFF (El orquestador principal)
-        - id: ms-bff-route
-          uri: http://localhost:8081
-          predicates:
-            - Path=/api/v1/bff/**
-
-        # 2. Usuarios - Rutas Públicas (Login/Registro)
-        - id: ms-usuarios-public-route
-          uri: http://localhost:8001
-          predicates:
-            - Path=/api/v1/usuarios/auth/**
-
-        # 3. Usuarios - Rutas Privadas (Perfil, etc.)
-        - id: ms-usuarios-private-route
-          uri: http://localhost:8001
-          predicates:
-            - Path=/api/v1/usuarios/**
-
-        # 4. Lista de Espera
-        - id: ms-lista-espera-route
-          uri: http://localhost:8082
-          predicates:
-            - Path=/api/v1/lista-espera/**
-
-        # 5. Reasignación
-        - id: ms-reasignacion-route
-          uri: http://localhost:8083
-          predicates:
-            - Path=/api/v1/reasignar/**
-
       httpclient:
         connect-timeout: 5000
         response-timeout: 5s
 
 logging:
   level:
+    root: INFO
     org.springframework.cloud.gateway: INFO
-    org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator: INFO
+    com.rednorte.apigateway: DEBUG

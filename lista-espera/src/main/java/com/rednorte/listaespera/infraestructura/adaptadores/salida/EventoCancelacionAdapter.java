@@ -18,15 +18,13 @@ public class EventoCancelacionAdapter implements EventoCancelacionPort {
     public void publicarEvento(RegistroEspera registro) {
         webClientBuilder.build()
                 .post()
-                .uri("http://localhost:8083/api/v1/reasignacion/evento-cancelacion")
+                .uri("http://localhost:8083/api/v1/reasignar/ejecutar")
                 .bodyValue(Map.of(
-                        "idInterconsulta", registro.getId(),
-                        "rutPaciente",    registro.getRutPaciente(),
-                        "especialidad",   registro.getEspecialidadDestino(),
-                        "motivo",         registro.getMotivoCancelacion() != null
-                                ? registro.getMotivoCancelacion() : "",
-                        "canceladoPor",   registro.getCanceladoPor() != null
-                                ? registro.getCanceladoPor() : ""
+                        "idInterconsultaOriginal", registro.getId(),
+                        "rutPaciente",             registro.getRutPaciente(),
+                        "especialidad",            registro.getEspecialidadDestino(),
+                        "motivo",                  registro.getMotivoCancelacion() != null
+                                ? registro.getMotivoCancelacion() : ""
                 ))
                 .retrieve()
                 .bodyToMono(Void.class)
