@@ -1,0 +1,53 @@
+server:
+  port: 8083
+
+spring:
+  # 1. Base de datos MySQL (Puerto 3308 del Docker)
+  datasource:
+    url: jdbc:mysql://localhost:3308/db_reasignacion?createDatabaseIfNotExist=true&serverTimezone=America/Santiago&useSSL=false&allowPublicKeyRetrieval=true
+    username: user_reasignacion
+    password: devpassword
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  # 2. Configuración de Kafka (Broker en puerto 9092)
+  kafka:
+    bootstrap-servers: localhost:9092
+    # Recibir mensajes (Consumidor)
+    consumer:
+      group-id: reasignacion-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.rednorte.msreasignacion.domain.model"
+    # Enviar mensajes (Productor)
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+# 3. Descubrimiento de red interna de microservicios
+services:
+  lista-espera:
+    url: http://localhost:8082
+  usuarios:
+    url: http://localhost:8001
+
+# 4. Simulación de Servidor de Correos local
+notificacion:
+  email:
+    enabled: true
+    host: localhost
+
+# 5. Propiedad del tópico de mensajería asíncrona
+app:
+  kafka:
+    topic-notificacion: "notificaciones-paciente-topic"

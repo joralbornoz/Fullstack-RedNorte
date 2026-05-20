@@ -1,0 +1,19 @@
+services:
+  lista-espera:
+    url: http://ms-lista-espera:8002
+  usuarios:
+    url: http://ms-usuarios:8001
+
+# Configuración real de servidor de correos (Ejemplo)
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_USER}
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true

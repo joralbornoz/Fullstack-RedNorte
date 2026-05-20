@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: ms-lista-espera
+  profiles:
+    active: dev 
+
+server:
+  port: 8082
+
+logging:
+  level:
+    com.rednorte.listaespera: DEBUG
