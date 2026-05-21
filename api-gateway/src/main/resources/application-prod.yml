@@ -1,0 +1,29 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: gateway-auth-route
+          uri: http://ms-usuarios:8001
+          predicates:
+            - Path=/api/v1/auth/**
+          filters:
+            - RewritePath=/api/v1/auth/(?<segment>.*), /api/v1/usuarios/auth/${segment}
+
+        - id: ms-usuarios-auth-route
+          uri: http://ms-usuarios:8001
+          predicates:
+            - Path=/api/v1/usuarios/auth/**
+
+        - id: ms-usuarios-private-route
+          uri: http://ms-usuarios:8001
+          predicates:
+            - Path=/api/v1/usuarios/**
+
+        - id: ms-bff-route
+          uri: http://ms-bff:8081
+          predicates:
+            - Path=/api/v1/bff/**
+
+services:
+  usuarios:
+    url: http://ms-usuarios:8001/api/v1

@@ -1,0 +1,7 @@
+services:
+  usuarios:
+    url: http://localhost:8001/api/v1
+  lista-espera:
+    url: http://localhost:8082/api/v1
+  reasignacion:
+    url: http://localhost:8083/api/v1

@@ -1,0 +1,17 @@
+server:
+  port: 8082
+
+spring:
+  datasource:
+    url: jdbc:mysql://db-lista-espera:3306/db_lista_espera?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: user_lista_espera
+    password: devpassword
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+
+logging:
+  level:
+    root: INFO
+    com.rednorte.listaespera: INFO

@@ -1,0 +1,19 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: ms-bff
+
+services:
+  usuarios:
+    url: http://ms-usuarios:8001/api/v1
+  lista-espera:
+    url: http://lista-espera:8082/api/v1
+  reasignacion:
+    url: http://ms-reasignacion:8083/api/v1
+
+logging:
+  level:
+    root: INFO
+    com.rednorte.msbff: INFO

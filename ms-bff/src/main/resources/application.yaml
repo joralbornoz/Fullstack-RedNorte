@@ -1,0 +1,13 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: ms-bff
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+logging:
+  level:
+    root: INFO
+    com.rednorte.msbff: INFO
