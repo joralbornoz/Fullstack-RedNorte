@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RedNorte · Patrones de Testing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #1e1e1e;
+      --bg-panel:  #252526;
+      --bg-bar:    #2d2d2d;
+      --bg-line:   #2a2a2a;
+      --border:    #3c3c3c;
+      --text:      #d4d4d4;
+      --text-dim:  #858585;
+      --text-head: #cccccc;
+      --accent:    #4ec9b0;        /* VS Code teal — solo para detalles */
+
+      /* Syntax — paleta VS Code Light apagada sobre fondo oscuro */
+      --kw:   #569cd6;   /* keywords: const, async, function */
+      --fn:   #dcdcaa;   /* funciones */
+      --str:  #ce9178;   /* strings */
+      --cm:   #6a9955;   /* comentarios */
+      --cls:  #4ec9b0;   /* clases/componentes */
+      --prp:  #9cdcfe;   /* propiedades */
+      --pct:  #d4d4d4;   /* puntuación */
+      --num:  #b5cea8;   /* números */
+      --rx:   #d16969;   /* regex */
+
+      /* Fases AAA — fondos muy sutiles */
+      --arr-bg:  rgba(86, 156, 214, 0.06);
+      --arr-bd:  rgba(86, 156, 214, 0.35);
+      --act-bg:  rgba(78, 201, 176, 0.06);
+      --act-bd:  rgba(78, 201, 176, 0.35);
+      --ass-bg:  rgba(106, 153, 85, 0.06);
+      --ass-bd:  rgba(106, 153, 85, 0.35);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: #181818;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* ── Cabecera simple ── */
+    header {
+      background: var(--bg-bar);
+      border-bottom: 1px solid var(--border);
+      padding: 1.1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Fira Code', monospace;
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+    .logo strong { color: var(--text-head); font-weight: 500; }
+    .header-stats {
+      display: flex;
+      gap: 16px;
+      font-family: 'Fira Code', monospace;
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+    .header-stats span { color: var(--accent); }
+
+    /* ── Tabs navegación ── */
+    .tabs {
+      background: var(--bg-bar);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 0;
+      padding: 0 1.5rem;
+      overflow-x: auto;
+    }
+    .tab {
+      padding: 8px 18px;
+      font-size: 12.5px;
+      color: var(--text-dim);
+      text-decoration: none;
+      border-right: 1px solid var(--border);
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: color 0.15s;
+    }
+    .tab:hover { color: var(--text); border-bottom-color: var(--border); }
+
+    /* ── Layout principal ── */
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    /* ── Tarjeta de patrón ── */
+    .card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    /* Cabecera de tarjeta */
+    .card-head {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-bar);
+    }
+    .card-num {
+      font-family: 'Fira Code', monospace;
+      font-size: 11px;
+      color: var(--text-dim);
+      background: var(--bg-line);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 2px 8px;
+    }
+    .card-title {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-head);
+    }
+    .card-sub {
+      font-family: 'Fira Code', monospace;
+      font-size: 11.5px;
+      color: var(--text-dim);
+      margin-left: auto;
+    }
+
+    /* Descripción */
+    .card-desc {
+      padding: 10px 16px;
+      font-size: 12.5px;
+      color: var(--text-dim);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    /* Ventana de código */
+    .code-win {
+      background: var(--bg);
+    }
+    .code-bar {
+      padding: 6px 14px;
+      background: var(--bg-bar);
+      border-bottom: 1px solid var(--border);
+      font-family: 'Fira Code', monospace;
+      font-size: 11px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .code-bar .fname { color: #cccccc; }
+    .code-pre {
+      padding: 1rem 1.25rem;
+      overflow-x: auto;
+      font-family: 'Fira Code', monospace;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    .code-pre pre { white-space: pre; }
+
+    /* Syntax */
+    .kw  { color: var(--kw); }
+    .fn  { color: var(--fn); }
+    .str { color: var(--str); }
+    .cm  { color: var(--cm); }
+    .cls { color: var(--cls); }
+    .prp { color: var(--prp); }
+    .pct { color: var(--pct); }
+    .num { color: var(--num); }
+    .rx  { color: var(--rx); }
+
+    /* Fases AAA */
+    .phase {
+      display: block;
+      padding: 4px 8px;
+      margin: 2px 0;
+      border-radius: 3px;
+      border-left: 2px solid;
+    }
+    .ph-a { background: var(--arr-bg); border-color: var(--arr-bd); }
+    .ph-b { background: var(--act-bg); border-color: var(--act-bd); }
+    .ph-c { background: var(--ass-bg); border-color: var(--ass-bd); }
+
+    .phase-tag {
+      display: inline-block;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      padding: 1px 6px;
+      border-radius: 2px;
+      margin-bottom: 2px;
+    }
+    .tag-a { background: rgba(86,156,214,0.15); color: #569cd6; }
+    .tag-b { background: rgba(78,201,176,0.15); color: #4ec9b0; }
+    .tag-c { background: rgba(106,153,85,0.15); color: #6a9955; }
+
+    /* Separador de columnas para mock */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    .col-l { border-right: 1px solid var(--border); }
+    .col-head {
+      padding: 5px 14px;
+      font-size: 11px;
+      font-family: 'Fira Code', monospace;
+      color: var(--text-dim);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-bar);
+    }
+    .col-ok  { color: #6a9955; }
+    .col-err { color: #f44747; }
+
+    /* Leyenda inferior */
+    .card-legend {
+      padding: 8px 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      background: var(--bg-bar);
+    }
+    .leg-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      color: var(--text-dim);
+      font-family: 'Fira Code', monospace;
+    }
+    .leg-dot {
+      width: 8px; height: 8px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 12px;
+      color: var(--text-dim);
+      border-top: 1px solid var(--border);
+      font-family: 'Fira Code', monospace;
+    }
+
+    @media (max-width: 600px) {
+      .two-col { grid-template-columns: 1fr; }
+      .col-l { border-right: none; border-bottom: 1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ─────────────────────────────────────────────────────── -->
+<header>
+  <div class="logo">
+    <strong>RedNorte</strong> / docs / pruebas-unitarias / patrones-de-testing
+  </div>
+  <div class="header-stats">
+    tests: <span>105</span> &nbsp;|&nbsp;
+    suites: <span>12</span> &nbsp;|&nbsp;
+    coverage: <span>88.45%</span>
+  </div>
+</header>
+
+<!-- ── TABS ───────────────────────────────────────────────────────── -->
+<div class="tabs">
+  <a class="tab" href="#aaa">01 · Arrange-Act-Assert</a>
+  <a class="tab" href="#mock">02 · Mocking Estratégico</a>
+  <a class="tab" href="#factory">03 · Factory Method</a>
+</div>
+
+<!-- ── CONTENIDO ──────────────────────────────────────────────────── -->
+<main>
+
+  <!-- ═══════════════════════════════
+       PATRÓN 1 — AAA
+  ════════════════════════════════════ -->
+  <div class="card" id="aaa">
+    <div class="card-head">
+      <span class="card-num">Patrón 01</span>
+      <span class="card-title">Arrange · Act · Assert</span>
+      <span class="card-sub">// estructura universal de cada test</span>
+    </div>
+    <div class="card-desc">
+      Cada prueba se divide en tres bloques con responsabilidades separadas.
+      El color de borde izquierdo indica qué fase está activa — sin mezclar preparación, ejecución y verificación.
+    </div>
+
+    <div class="code-win">
+      <div class="code-bar">📄 <span class="fname">LoginPage.test.jsx</span></div>
+      <div class="code-pre"><pre>
+<span class="fn">test</span><span class="pct">(</span><span class="str">'muestra error cuando las credenciales son inválidas'</span><span class="pct">,</span> <span class="kw">async</span> <span class="pct">() =&gt; {</span>
+
+<span class="phase ph-a"><span class="phase-tag tag-a">Arrange — preparar estado inicial</span>
+  <span class="cm">// El mock simula que el servidor rechaza las credenciales</span>
+  <span class="prp">authService</span><span class="pct">.</span><span class="fn">login</span><span class="pct">.</span><span class="fn">mockRejectedValue</span><span class="pct">({</span>
+    <span class="prp">response</span><span class="pct">: {</span> <span class="prp">data</span><span class="pct">: {</span> <span class="prp">mensaje</span><span class="pct">:</span> <span class="str">'RUT o contraseña incorrectos'</span> <span class="pct">} },</span>
+  <span class="pct">})</span>
+  <span class="fn">renderLogin</span><span class="pct">()</span>    <span class="cm">// monta el componente en el DOM de prueba</span></span>
+
+<span class="phase ph-b"><span class="phase-tag tag-b">Act — simular acciones reales del usuario</span>
+  <span class="kw">await</span> <span class="fn">userEvent</span><span class="pct">.</span><span class="fn">type</span><span class="pct">(</span><span class="fn">screen</span><span class="pct">.</span><span class="fn">getByPlaceholderText</span><span class="pct">(</span><span class="str">'Ej: 12.345.678-9'</span><span class="pct">),</span> <span class="str">'rut-malo'</span><span class="pct">)</span>
+  <span class="kw">await</span> <span class="fn">userEvent</span><span class="pct">.</span><span class="fn">type</span><span class="pct">(</span><span class="fn">screen</span><span class="pct">.</span><span class="fn">getByPlaceholderText</span><span class="pct">(</span><span class="str">'••••••••'</span><span class="pct">),</span> <span class="str">'clave-mala'</span><span class="pct">)</span>
+  <span class="kw">await</span> <span class="fn">userEvent</span><span class="pct">.</span><span class="fn">click</span><span class="pct">(</span><span class="fn">screen</span><span class="pct">.</span><span class="fn">getByRole</span><span class="pct">(</span><span class="str">'button'</span><span class="pct">, {</span> <span class="prp">name</span><span class="pct">:</span> <span class="rx">/ingresar/i</span> <span class="pct">}))</span></span>
+
+<span class="phase ph-c"><span class="phase-tag tag-c">Assert — verificar el resultado esperado</span>
+  <span class="kw">await</span> <span class="fn">waitFor</span><span class="pct">(() =&gt;</span>
+    <span class="fn">expect</span><span class="pct">(</span><span class="fn">screen</span><span class="pct">.</span><span class="fn">getByText</span><span class="pct">(</span><span class="str">'RUT o contraseña incorrectos'</span><span class="pct">)).</span><span class="fn">toBeInTheDocument</span><span class="pct">()</span>
+  <span class="pct">)</span>
+  <span class="fn">expect</span><span class="pct">(</span><span class="prp">mockNavigate</span><span class="pct">).</span><span class="kw">not</span><span class="pct">.</span><span class="fn">toHaveBeenCalled</span><span class="pct">()</span></span>
+
+<span class="pct">})</span>
+</pre></div>
+    </div>
+
+    <div class="card-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#569cd6;opacity:.6"></div> Arrange</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#4ec9b0;opacity:.6"></div> Act</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#6a9955;opacity:.6"></div> Assert</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       PATRÓN 2 — MOCKING
+  ════════════════════════════════════ -->
+  <div class="card" id="mock">
+    <div class="card-head">
+      <span class="card-num">Patrón 02</span>
+      <span class="card-title">Mocking Estratégico — Test Doubles</span>
+      <span class="card-sub">// dos estrategias según el contexto</span>
+    </div>
+    <div class="card-desc">
+      Estrategia A: <code>jest.mock()</code> de módulo completo para servicios externos (nunca se ejecuta Axios real).
+      Estrategia B: Provider real + componente consumidor para probar la lógica interna de React Context.
+    </div>
+
+    <!-- Estrategia A: jest.mock() -->
+    <div class="code-win">
+      <div class="code-bar">📄 <span class="fname">MedicoDashboard.test.jsx</span> — Estrategia A: aislamiento de módulo</div>
+      <div class="code-pre"><pre>
+<span class="cm">// Reemplaza el módulo entero antes de que el componente lo importe</span>
+<span class="fn">jest</span><span class="pct">.</span><span class="fn">mock</span><span class="pct">(</span><span class="str">'../../services'</span><span class="pct">, () =&gt; ({</span>
+  <span class="prp">listaEsperaService</span><span class="pct">: {</span>
+    <span class="prp">obtenerTodo</span><span class="pct">:</span>          <span class="fn">jest</span><span class="pct">.</span><span class="fn">fn</span><span class="pct">(),</span>
+    <span class="prp">crear</span><span class="pct">:</span>               <span class="fn">jest</span><span class="pct">.</span><span class="fn">fn</span><span class="pct">(),</span>
+    <span class="prp">actualizar</span><span class="pct">:</span>          <span class="fn">jest</span><span class="pct">.</span><span class="fn">fn</span><span class="pct">(),</span>
+    <span class="prp">cancelarYReasignar</span><span class="pct">:</span>  <span class="fn">jest</span><span class="pct">.</span><span class="fn">fn</span><span class="pct">(),</span>
+  <span class="pct">},</span>
+<span class="pct">}))</span>
+</pre></div>
+    </div>
+
+    <!-- Comparativa resolved/rejected -->
+    <div class="two-col" style="border-top:1px solid var(--border)">
+      <div class="col-l">
+        <div class="col-head"><span class="col-ok">✓</span> mockResolvedValue — respuesta exitosa</div>
+        <div class="code-pre"><pre>
+<span class="prp">listaEsperaService</span><span class="pct">.</span><span class="prp">getAll</span>
+  <span class="pct">.</span><span class="fn">mockResolvedValue</span><span class="pct">({</span>
+    <span class="prp">data</span><span class="pct">: {</span>
+      <span class="prp">listaEspera</span><span class="pct">: [</span><span class="prp">MOCK_CONSULTAS</span><span class="pct">],</span>
+      <span class="prp">resumen</span><span class="pct">:     </span><span class="prp">MOCK_RESUMEN</span><span class="pct">,</span>
+    <span class="pct">},</span>
+  <span class="pct">})</span>
+
+<span class="cm">// → el componente muestra los datos</span>
+</pre></div>
+      </div>
+      <div>
+        <div class="col-head"><span class="col-err">✗</span> mockRejectedValue — error de red</div>
+        <div class="code-pre"><pre>
+<span class="prp">listaEsperaService</span><span class="pct">.</span><span class="prp">getAll</span>
+  <span class="pct">.</span><span class="fn">mockRejectedValue</span><span class="pct">(</span>
+    <span class="kw">new</span> <span class="cls">Error</span><span class="pct">(</span><span class="str">'Network Error'</span><span class="pct">)</span>
+  <span class="pct">)</span>
+
+<span class="cm">// → el componente muestra:</span>
+<span class="cm">// "Error de conexión"</span>
+</pre></div>
+      </div>
+    </div>
+
+    <!-- Estrategia B -->
+    <div class="code-win" style="border-top:1px solid var(--border)">
+      <div class="code-bar">📄 <span class="fname">AuthContext.test.jsx</span> — Estrategia B: Provider real + spy</div>
+      <div class="code-pre"><pre>
+<span class="cm">// Para testear la lógica interna del Context, usamos el Provider real</span>
+<span class="cm">// y un componente consumidor que actúa como "espía"</span>
+
+<span class="kw">function</span> <span class="fn">TestConsumer</span><span class="pct">() {</span>
+  <span class="kw">const</span> <span class="pct">{</span> <span class="prp">user</span><span class="pct">,</span> <span class="prp">login</span><span class="pct">,</span> <span class="prp">logout</span> <span class="pct">} =</span> <span class="fn">useAuth</span><span class="pct">()</span>
+  <span class="kw">return</span> <span class="pct">(</span>
+    <span class="pct">&lt;&gt;</span>
+      <span class="pct">&lt;</span><span class="cls">span</span><span class="pct">&gt;{</span><span class="prp">user</span><span class="pct">?.</span><span class="prp">nombre</span> <span class="pct">??</span> <span class="str">'sin sesión'</span><span class="pct">}&lt;/</span><span class="cls">span</span><span class="pct">&gt;</span>
+      <span class="pct">&lt;</span><span class="cls">button</span> <span class="prp">onClick</span><span class="pct">={() =&gt;</span> <span class="fn">login</span><span class="pct">({</span> <span class="prp">nombre</span><span class="pct">:</span> <span class="str">'Ana'</span><span class="pct">,</span> <span class="prp">rol</span><span class="pct">:</span> <span class="str">'ADMIN'</span> <span class="pct">})}&gt;</span>Login<span class="pct">&lt;/</span><span class="cls">button</span><span class="pct">&gt;</span>
+    <span class="pct">&lt;/&gt;</span>
+  <span class="pct">)</span>
+<span class="pct">}</span>
+
+<span class="fn">test</span><span class="pct">(</span><span class="str">'login() guarda el usuario y lo persiste en localStorage'</span><span class="pct">,</span> <span class="kw">async</span> <span class="pct">() =&gt; {</span>
+  <span class="fn">render</span><span class="pct">(&lt;</span><span class="cls">AuthProvider</span><span class="pct">&gt;&lt;</span><span class="cls">TestConsumer</span> <span class="pct">/&gt;&lt;/</span><span class="cls">AuthProvider</span><span class="pct">&gt;)</span>
+
+  <span class="kw">await</span> <span class="fn">userEvent</span><span class="pct">.</span><span class="fn">click</span><span class="pct">(</span><span class="fn">screen</span><span class="pct">.</span><span class="fn">getByText</span><span class="pct">(</span><span class="str">'Login'</span><span class="pct">))</span>
+
+  <span class="fn">expect</span><span class="pct">(</span><span class="fn">screen</span><span class="pct">.</span><span class="fn">getByText</span><span class="pct">(</span><span class="str">'Ana'</span><span class="pct">)).</span><span class="fn">toBeInTheDocument</span><span class="pct">()</span>
+  <span class="fn">expect</span><span class="pct">(</span><span class="prp">localStorage</span><span class="pct">.</span><span class="fn">getItem</span><span class="pct">(</span><span class="str">'rednorte_user'</span><span class="pct">)).</span><span class="fn">toContain</span><span class="pct">(</span><span class="str">'Ana'</span><span class="pct">)</span>
+<span class="pct">})</span>
+</pre></div>
+    </div>
+
+    <div class="card-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#6a9955;opacity:.7"></div> mockResolvedValue — camino exitoso</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#f44747;opacity:.7"></div> mockRejectedValue — camino de error</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#569cd6;opacity:.7"></div> Provider real — para lógica interna de Context</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       PATRÓN 3 — FACTORY
+  ════════════════════════════════════ -->
+  <div class="card" id="factory">
+    <div class="card-head">
+      <span class="card-num">Patrón 03</span>
+      <span class="card-title">Factory Method — renderAndLoad()</span>
+      <span class="card-sub">// evita repetir configuración en cada test</span>
+    </div>
+    <div class="card-desc">
+      Sin el factory, cada test necesitaría 8+ líneas para configurar Router, Context y esperar carga.
+      La función centraliza eso: cada test usa 1 línea y se enfoca solo en su lógica.
+    </div>
+
+    <div class="code-win">
+      <div class="code-bar">📄 <span class="fname">AdminDashboard.test.jsx</span></div>
+      <div class="code-pre"><pre>
+<span class="cm">// ── La función Factory ────────────────────────────────────────────────</span>
+<span class="kw">const</span> <span class="prp">USER_MOCK</span> <span class="pct">= {</span> <span class="prp">nombre</span><span class="pct">:</span> <span class="str">'Admin Test'</span><span class="pct">,</span> <span class="prp">rol</span><span class="pct">:</span> <span class="str">'ADMIN'</span><span class="pct">,</span> <span class="prp">token</span><span class="pct">:</span> <span class="str">'jwt-ok'</span> <span class="pct">}</span>
+
+<span class="kw">async function</span> <span class="fn">renderAndLoad</span><span class="pct">(</span><span class="prp">overrides</span> <span class="pct">= {}) {</span>
+  <span class="fn">useAuth</span><span class="pct">.</span><span class="fn">mockReturnValue</span><span class="pct">({</span> <span class="prp">user</span><span class="pct">: {</span> <span class="pct">...</span><span class="prp">USER_MOCK</span><span class="pct">,</span> <span class="pct">...</span><span class="prp">overrides</span> <span class="pct">},</span> <span class="prp">logout</span><span class="pct">:</span> <span class="fn">jest</span><span class="pct">.</span><span class="fn">fn</span><span class="pct">() })</span>
+
+  <span class="fn">render</span><span class="pct">(</span>
+    <span class="pct">&lt;</span><span class="cls">MemoryRouter</span> <span class="prp">initialEntries</span><span class="pct">={[</span><span class="str">'/admin'</span><span class="pct">]}&gt;</span>
+      <span class="pct">&lt;</span><span class="cls">Routes</span><span class="pct">&gt;</span>
+        <span class="pct">&lt;</span><span class="cls">Route</span> <span class="prp">path</span><span class="pct">=</span><span class="str">"/admin"</span> <span class="prp">element</span><span class="pct">={&lt;</span><span class="cls">AdminDashboard</span> <span class="pct">/&gt;} /&gt;</span>
+      <span class="pct">&lt;/</span><span class="cls">Routes</span><span class="pct">&gt;</span>
+    <span class="pct">&lt;/</span><span class="cls">MemoryRouter</span><span class="pct">&gt;</span>
+  <span class="pct">)</span>
+
+  <span class="cm">// Espera a que el spinner de carga desaparezca antes de continuar</span>
+  <span class="kw">await</span> <span class="fn">waitFor</span><span class="pct">(() =&gt;</span>
+    <span class="fn">expect</span><span class="pct">(</span><span class="fn">screen</span><span class="pct">.</span><span class="fn">queryByText</span><span class="pct">(</span><span class="rx">/cargando/i</span><span class="pct">)).</span><span class="kw">not</span><span class="pct">.</span><span class="fn">toBeInTheDocument</span><span class="pct">()</span>
+  <span class="pct">)</span>
+<span class="pct">}</span>
+
+<span class="cm">// ── Uso: cada test queda en 2-3 líneas ───────────────────────────────</span>
+
+<span class="fn">test</span><span class="pct">(</span><span class="str">'muestra la lista de pacientes al cargar'</span><span class="pct">,</span> <span class="kw">async</span> <span class="pct">() =&gt; {</span>
+  <span class="kw">await</span> <span class="fn">renderAndLoad</span><span class="pct">()</span>
+  <span class="fn">expect</span><span class="pct">(</span><span class="fn">screen</span><span class="pct">.</span><span class="fn">getByText</span><span class="pct">(</span><span class="str">'Ana Pérez'</span><span class="pct">)).</span><span class="fn">toBeInTheDocument</span><span class="pct">()</span>
+<span class="pct">})</span>
+
+<span class="fn">test</span><span class="pct">(</span><span class="str">'muestra error cuando la API falla'</span><span class="pct">,</span> <span class="kw">async</span> <span class="pct">() =&gt; {</span>
+  <span class="prp">listaEsperaService</span><span class="pct">.</span><span class="prp">getAll</span><span class="pct">.</span><span class="fn">mockRejectedValue</span><span class="pct">(</span><span class="kw">new</span> <span class="cls">Error</span><span class="pct">())</span>
+  <span class="kw">await</span> <span class="fn">renderAndLoad</span><span class="pct">()</span>
+  <span class="fn">expect</span><span class="pct">(</span><span class="fn">screen</span><span class="pct">.</span><span class="fn">getByText</span><span class="pct">(</span><span class="rx">/error de conexión/i</span><span class="pct">)).</span><span class="fn">toBeInTheDocument</span><span class="pct">()</span>
+<span class="pct">})</span>
+
+<span class="fn">test</span><span class="pct">(</span><span class="str">'modal valida campos vacíos al enviar'</span><span class="pct">,</span> <span class="kw">async</span> <span class="pct">() =&gt; {</span>
+  <span class="kw">await</span> <span class="fn">renderAndLoad</span><span class="pct">()</span>
+  <span class="kw">await</span> <span class="fn">userEvent</span><span class="pct">.</span><span class="fn">click</span><span class="pct">(</span><span class="fn">screen</span><span class="pct">.</span><span class="fn">getByText</span><span class="pct">(</span><span class="str">'+ Nueva consulta'</span><span class="pct">))</span>
+  <span class="fn">expect</span><span class="pct">(</span><span class="fn">screen</span><span class="pct">.</span><span class="fn">getByText</span><span class="pct">(</span><span class="str">'El RUT es requerido'</span><span class="pct">)).</span><span class="fn">toBeInTheDocument</span><span class="pct">()</span>
+<span class="pct">})</span>
+</pre></div>
+    </div>
+
+    <div class="card-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#dcdcaa;opacity:.7"></div> renderAndLoad() — factory que construye todo el entorno</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#9cdcfe;opacity:.7"></div> overrides — permite variaciones por test sin nueva función</div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  RedNorte · DSY1106 Desarrollo Fullstack III · 105 tests · 12 suites · coverage 88.45%
+</footer>
+
+</body>
+</html>
