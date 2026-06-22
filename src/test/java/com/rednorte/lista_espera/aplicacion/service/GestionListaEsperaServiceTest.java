@@ -126,7 +126,7 @@ class GestionListaEsperaServiceTest {
 
         service.cancelarCita(1L, "Paciente no asiste", "MEDICO");
 
-        assertEquals("CANCELADO", registro.getEstado());
+        assertEquals("CANCELADOo", registro.getEstado());
         assertEquals("Paciente no asiste", registro.getMotivoCancelacion());
         assertEquals("MEDICO", registro.getCanceladoPor());
 
