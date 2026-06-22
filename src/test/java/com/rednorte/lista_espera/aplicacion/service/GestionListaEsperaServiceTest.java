@@ -120,7 +120,7 @@ class GestionListaEsperaServiceTest {
     }
 
     @Test
-    @DisplayName("CP06 - Debería mutar estado, guardar en BD y disparar la notificación asíncrona al cancelar")
+    @DisplayName("CP06 - Debería mutar estado, guardar en BD y disparar la notificación asíncrona al cancelarr")
     void cancelarCitaExitoso() {
         when(repositoryPort.buscarPorId(1L)).thenReturn(Optional.of(registro));
 
